@@ -47,10 +47,10 @@
 									class="img-fluid" alt="" />
 								<div class="portfolio-info">
 									<h4>
-										<a href="${pageContext.request.contextPath}/image/imgInfo?imageId=${image.id}">${image.titre}</a>
+										${image.titre}
 									</h4>
 									<p>${image.description}</p>
-									<p> <a href="${pageContext.request.contextPath}/album?albumId=${image.album.id}">Album : ${image.album.nomAlbum }</a></p>
+									<p> Album : ${image.album.nomAlbum }</p>
 									<div>
 										<a
 											href="${pageContext.request.contextPath}/image/getOne?imageUrl=${image.fileImage}"

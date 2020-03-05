@@ -16,7 +16,6 @@ public class AlbumDao {
 	}
 
 	public int createAlbum(Album album, Utilisateur user) throws DaoException {
-
 		Transaction tx = null;
 		try (Session session = DatabaseManager.getDatabaseManager().openSession()) {
 			if (album != null) {
@@ -32,10 +31,41 @@ public class AlbumDao {
 			throw new DaoException(e.getMessage());
 		}
 	}
+	
+	public int updateAlbum(Album newAlbum) throws DaoException {
+		Transaction tx = null;
+		try(Session session = DatabaseManager.getDatabaseManager().openSession()){
+			tx = session.beginTransaction();
+			ArrayList<Album> albums = getAllAlbum();
+			for(Album a : albums) {
+				if(a.getId() == newAlbum.getId()) {
+					a.setAlbumUrl(newAlbum.getAlbumUrl());
+					a.setPrivateAlbum(newAlbum.isPrivateAlbum());
+					a.setNomAlbum(newAlbum.getNomAlbum());
+					//System.out.println("Nom url : " +a.getNomAlbum()+" private album : "+a.isPrivateAlbum()+" albumCoverUrl : "+a.getAlbumUrl());
+					Query q = session.createQuery("Update Album set nomAlbum=:nomAlbum, albumUrl=:albumUrl, privateAlbum=:isPrivate where id=:id");
+					q.setParameter("nomAlbum",newAlbum.getNomAlbum());
+					q.setParameter("albumUrl", newAlbum.getAlbumUrl());
+					q.setParameter("isPrivate", newAlbum.isPrivateAlbum());
+					q.setParameter("id", newAlbum.getId());
+					int res = q.executeUpdate();
+					tx.commit();
+					return res;
+				}
+			}
+			session.close();
+		  return 200;
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			throw new DaoException(e.getMessage());
+		}
+	}
 
 	public ArrayList<Album> getAlbums(int userId) throws DaoException {
 		try (Session session = DatabaseManager.getDatabaseManager().openSession()) {
-			Query q = session.createQuery("from Album a where a.proprietaire_id:=userId ");
+			
+			Query q = session.createQuery("from Album a where a.proprietaire.id=:userId ");
 			q.setParameter("userId", userId);
 			@SuppressWarnings("unchecked")
 			ArrayList<Album> r = (ArrayList<Album>) q.getResultList();

@@ -13,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @Entity
 public class Album {
 
@@ -26,14 +29,15 @@ public class Album {
 	private String albumUrl;
 
 	@Column
-	private boolean isPrivate;
+	private boolean privateAlbum;
 
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	private Utilisateur proprietaire;
 
-	@OneToMany(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.REMOVE,orphanRemoval = true,mappedBy = "album",fetch = FetchType.EAGER)
 	private List<Image> images;
 
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.REMOVE)
 	private List<Utilisateur> grantedUser;
 
@@ -97,12 +101,12 @@ public class Album {
 		this.albumUrl = albumUrl;
 	}
 
-	public boolean isPrivate() {
-		return isPrivate;
+	public boolean isPrivateAlbum() {
+		return privateAlbum;
 	}
 
-	public void setPrivate(boolean isPrivate) {
-		this.isPrivate = isPrivate;
+	public void setPrivateAlbum(boolean privateAlbum) {
+		this.privateAlbum = privateAlbum;
 	}
 
 	public void setImages(List<Image> images) {

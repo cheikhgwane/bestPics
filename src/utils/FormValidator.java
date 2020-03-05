@@ -54,9 +54,9 @@ public class FormValidator {
 		Album a = new Album();
 		a.setNomAlbum(getValue("albumName"));
 		if(getValue("isPrivate")!=null) {
-			a.setPrivate(true);
+			a.setPrivateAlbum(true);
 		}else {
-			a.setPrivate(false);
+			a.setPrivateAlbum(false);
 		}
      	return a;
 	}

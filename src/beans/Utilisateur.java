@@ -27,7 +27,7 @@ public class Utilisateur {
 	private boolean admin;
 
 
-	@OneToMany(cascade=CascadeType.REMOVE)
+	@OneToMany(cascade=CascadeType.REMOVE,orphanRemoval = true)
 	private List<Album> albums;
 	
 	public Utilisateur() {

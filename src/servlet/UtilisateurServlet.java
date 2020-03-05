@@ -25,6 +25,8 @@ public class UtilisateurServlet extends HttpServlet {
 	private static final String ADD_VIEW = "/WEB-INF/addUser.jsp";
 	private static final String MODIFY_VIEW = "/WEB-INF/modifyUser.jsp";
 	private static final String USER_LIST_VIEW = "/WEB-INF/userList.jsp";
+	private static final String REGISTER_VIEW = "/WEB-INF/register.jsp";
+	private static final String LOGIN_VIEW = "/WEB-INF/login.jsp";
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -43,15 +45,17 @@ public class UtilisateurServlet extends HttpServlet {
 
 		String requestedUrl = request.getRequestURI();
 		UtilisateurDao dao = new UtilisateurDao();
-		
+
 		if (requestedUrl.endsWith("/add")) {
 			getServletContext().getRequestDispatcher(ADD_VIEW).forward(request, response);
+			return;
 
 		} else if (requestedUrl.endsWith("/modify")) {
 
 			String id = request.getParameter("idUser");
 			if (id == null) {
 				getServletContext().getRequestDispatcher(HOME_VIEW).forward(request, response);
+				return;
 			}
 
 			try {
@@ -60,10 +64,12 @@ public class UtilisateurServlet extends HttpServlet {
 					request.setAttribute("utilisateur", u);
 				}
 				getServletContext().getRequestDispatcher(MODIFY_VIEW).forward(request, response);
+				return;
 
 			} catch (DaoException e) {
 				e.printStackTrace();
 				getServletContext().getRequestDispatcher(MODIFY_VIEW).forward(request, response);
+				return;
 			}
 
 		} else if (requestedUrl.endsWith("/list")) {
@@ -75,7 +81,7 @@ public class UtilisateurServlet extends HttpServlet {
 				System.out.println(d.getMessage());
 			}
 			getServletContext().getRequestDispatcher(USER_LIST_VIEW).forward(request, response);
-
+			return;
 		} else if (requestedUrl.endsWith("/delete")) {
 
 			String _id = request.getParameter("idUser");
@@ -87,15 +93,16 @@ public class UtilisateurServlet extends HttpServlet {
 
 			try {
 				int res = dao.deleteUser(idUser);
-				System.out.println("res"+res);
+				System.out.println("res" + res);
 			} catch (DaoException e) {
 				System.out.println(e.getMessage());
 				e.printStackTrace();
 			}
-			response.sendRedirect("list");
+			response.sendRedirect(request.getContextPath() + "/user/list");
+			return;
 
 		}
-		 getServletContext().getRequestDispatcher(USER_LIST_VIEW).forward(request,response);
+		response.sendRedirect(request.getContextPath() + "/user/list");
 
 	}
 
@@ -122,20 +129,39 @@ public class UtilisateurServlet extends HttpServlet {
 			}
 
 			try {
-
 				dao.addUtilisateur(validator.getUser());
-				request.setAttribute("status", "Utilisateur ajouté");
-				getServletContext().getRequestDispatcher(ADD_VIEW).forward(request, response);
+				getServletContext().getRequestDispatcher(USER_LIST_VIEW).forward(request, response);
 
 			} catch (DaoException e) {
 				System.out.println(e.getMessage());
 				request.setAttribute("status", "Erreur lors de l'ajout utilisateur");
 				getServletContext().getRequestDispatcher(ADD_VIEW).forward(request, response);
 				return;
-
 			}
-		}else if(requestedUrl.endsWith("/modify")) {
-			String fields[] = { "nom", "prenom"};
+
+		} else if (requestedUrl.endsWith("/register")) {
+			
+			String fields[] = { "nom", "prenom", "login", "password" };
+			boolean result = validator.validateForm(fields);
+			if (!result) {
+				request.setAttribute("error", validator.getErrors());
+				request.setAttribute("status", "Erreur lors de l'inscription");
+				getServletContext().getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+				return;
+			}
+
+			try {
+				dao.addUtilisateur(validator.getUser());
+				getServletContext().getRequestDispatcher(LOGIN_VIEW).forward(request, response);
+
+			} catch (DaoException e) {
+				System.out.println(e.getMessage());
+				request.setAttribute("status", "Erreur lors de l'ajout utilisateur");
+				getServletContext().getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+				return;
+			}
+		} else if (requestedUrl.endsWith("/modify")) {
+			String fields[] = { "nom", "prenom" };
 			boolean result = validator.validateForm(fields);
 			if (!result) {
 				request.setAttribute("error", validator.getErrors());
@@ -146,8 +172,8 @@ public class UtilisateurServlet extends HttpServlet {
 
 			try {
 				Utilisateur u = dao.findUser(Integer.valueOf(request.getParameter("idUser")));
-				System.out.println("login"+u.getLogin());
-				System.out.println("nom"+u.getNom());
+				System.out.println("login" + u.getLogin());
+				System.out.println("nom" + u.getNom());
 				System.out.println(u.getPrenom());
 				Utilisateur old = validator.getUser();
 				u.setPrenom(old.getPrenom());
@@ -160,10 +186,7 @@ public class UtilisateurServlet extends HttpServlet {
 
 			}
 		}
-		
-		//
-		
-		
+
 	}
 
 }

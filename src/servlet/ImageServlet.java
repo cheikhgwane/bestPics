@@ -1,10 +1,6 @@
 package servlet;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import beans.Album;
 import beans.Image;
+import beans.Utilisateur;
 import dao.AlbumDao;
 import dao.DaoException;
 import dao.ImageDao;
@@ -31,7 +28,6 @@ import utils.ImageUtils;
 @WebServlet("/image/*")
 public class ImageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String IMAGE_VIEW = "/WEB-INF/images.jsp";
 	private static final String IMAGE_INFO = "/WEB-INF/imgInfo.jsp";
 
 	/**
@@ -39,7 +35,6 @@ public class ImageServlet extends HttpServlet {
 	 */
 	public ImageServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -52,62 +47,36 @@ public class ImageServlet extends HttpServlet {
 		if (requestedUrl.endsWith("/image/imgInfo")) {
 			int id = Integer.valueOf(request.getParameter("imageId"));
 			try {
-				ArrayList<Image> images = dao.getImage();
-
-				for (Image i : images) {
-					if (i.getId() == id) {
-						request.setAttribute("image", i);
-						getServletContext().getRequestDispatcher(IMAGE_INFO).forward(request, response);
-						break;
-					}
-				}
+				Image i = dao.getOne(id);
+				request.setAttribute("image", i);
+				getServletContext().getRequestDispatcher(IMAGE_INFO).forward(request, response);
 			} catch (DaoException e) {
 				System.out.println(e.getMessage());
 				e.printStackTrace();
 			}
 
 		} else if (requestedUrl.endsWith("/image/getOne")) {
-			System.out.println("inside image servlet");
-
 			if ((imageUrl = getImageUrl(request)) != null) {
 
-				File f = new File(AlbumServlet.UPLOAD_DIR + "\\" + imageUrl);
+				ImageUtils utils = new ImageUtils(request);
+				ServletContext cntx = request.getServletContext();
+				String mime = cntx.getMimeType(imageUrl);
 
-				if (f.exists()) {
+				response.setContentLength((int) utils.getFileSize(imageUrl));
+				response.setContentType(mime);
 
-					DataInputStream input = new DataInputStream(new FileInputStream(f));
-
-					byte[] buffer = new byte[(int) f.length()];
-
-					input.read(buffer);
-
-					ServletContext cntx = request.getServletContext();
-					String mime = cntx.getMimeType(f.getPath());
-
-					response.setContentLength((int) f.length());
-					response.setContentType(mime);
-
-					response.getOutputStream().write(buffer);
-					input.close();
-				}
-
+				response.getOutputStream().write(utils.readImage(imageUrl));
 			}
-		} else if (requestedUrl.endsWith("/image/")) {
-			// tous les images dans un album
-			// si l'utilisateur fait partie du groupe granted ou que l'album est public
-			// ou bien que le current user est le proprio de l'album
-
-		} else if (requestedUrl.endsWith("/image/all")) {// tous les images appartenant à des repos public
-
 		} else if (requestedUrl.endsWith("/delete")) {
 			ImageDao imgDao = new ImageDao();
-
+			int idAlbum = 0;
 			int id = Integer.valueOf(request.getParameter("imageId"));
 			ArrayList<Image> images;
 			try {
 				images = imgDao.getImage();
 				for (Image i : images) {
 					if (i.getId() == id) {
+						idAlbum = i.getAlbum().getId();
 						imgDao.deleteImage(i);
 						break;
 					}
@@ -117,7 +86,7 @@ public class ImageServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 
-			response.sendRedirect(request.getContextPath() + "/album");
+			response.sendRedirect(request.getContextPath() + "/album?albumId=" + idAlbum);
 		}
 	}
 
@@ -128,6 +97,7 @@ public class ImageServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("Image id :" + request.getParameter("imageId"));
 		AlbumDao dao = new AlbumDao();
 
 		String requestedUrl = request.getRequestURI();
@@ -140,29 +110,19 @@ public class ImageServlet extends HttpServlet {
 
 		if (requestedUrl.endsWith("/add")) {
 			try {
+				imgUtils.uploadImage("imageFile");
 
 				Image i = validator.getImage();
+				i.setFileImage(imgUtils.getImageName());
 
-				File f = new File(AlbumServlet.UPLOAD_DIR);
-				if (!f.exists()) {
-					f.mkdir();
-				}
+				Dimension d = imgUtils.getFileDemension(imgUtils.getImageName());
 
-				DataInputStream inputStream = new DataInputStream(imgUtils.uploadImage("imageFile"));
-				byte[] buffer = new byte[(int) imgUtils.getFileSize()];
-				inputStream.read(buffer);
-
-				String imgName = imgUtils.getImageName();
-
-				File targetFile = new File(AlbumServlet.UPLOAD_DIR + "\\" + imgName);
-				String _id = request.getParameter("albumId");
-
-				int albumId = Integer.valueOf(_id);
-
-				System.out.println(" inside image servlet idAlbum : " + albumId);
+				i.setHauteur((int) d.getHeight());
+				i.setLargeur((int) d.getWidth());
 
 				ArrayList<Album> albums = dao.getAllAlbum();
 
+				int albumId = Integer.valueOf(request.getParameter("albumId"));
 				for (Album a : albums) {
 					if (a.getId() == albumId) {
 						i.setAlbum(a);
@@ -172,19 +132,24 @@ public class ImageServlet extends HttpServlet {
 
 				Date date = new Date();
 				i.setDateCreation(date);
-				// System.out.println(targetFile.getAbsoluteFile());
-
-				DataOutputStream outStream = new DataOutputStream(new FileOutputStream(targetFile));
-				i.setFileImage(imgUtils.getImageName());
-
-				outStream.write(buffer);
-				outStream.close();
-
 				imgDao.createImage(i);
-				response.sendRedirect(request.getContextPath() + "/album/albumId" + albumId);
+
+				response.sendRedirect(request.getContextPath() + "/album?albumId=" + albumId);
 			} catch (Exception e) {
 
 				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		} else if (requestedUrl.endsWith("/modify") && request.getParameter("imageId") != null) {
+			Image i = validator.getImage();
+			i.setId(Integer.valueOf(request.getParameter("imageId")));
+			System.out.println("Image id :" + request.getParameter("imageId"));
+			try {
+				imgDao.updateImage(i);
+				Utilisateur u = (Utilisateur) request.getSession().getAttribute("utilisateur");
+				response.sendRedirect(request.getContextPath() + "/album/user?userName=" + u.getLogin());
+			} catch (DaoException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

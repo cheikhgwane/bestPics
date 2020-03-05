@@ -6,7 +6,7 @@
 	<div class="container">
 		<div class="logo float-left">
 			<h1 class="text-light">
-				<a href="#header"> <span>Best PICS<img width="70px"
+				<a href="${pageContext.request.contextPath}"> <span>Best PICS<img width="70px"
 						height="70px"
 						src="${pageContext.request.contextPath}/img/logo.svg" alt="logo" />
 				</span>
@@ -16,17 +16,18 @@
 
 		<nav class="main-nav float-right d-none d-lg-block">
 			<ul>
-				<li class="active"><a href="">Home</a></li>
+				<li class="active"><a href="${pageContext.request.contextPath}/home/">Home</a></li>
 				<c:choose>
 					<c:when test="${empty sessionScope.utilisateur }">
-						<li><a href="<c:url value='/login'/>">Se connecter</a></li>
+						<li><a  class="active" href="<c:url value='/login'/>">Se connecter</a></li>
+							<li><a href="<c:url value='/register'/>">Ouvrir un compte</a></li>
 					</c:when>
 					<c:otherwise>
-						<li><a
-							href="<c:url value='/album/?user=${sessionScope.utilisateur.login}'/>">Mes
+						<li><a  
+							href="<c:url value='/album/user?userName=${sessionScope.utilisateur.login}'/>">Mes
 								photos</a></li>
 						<c:if test="${sessionScope.utilisateur.admin }">
-							<li><a
+							<li><a 
 								href="<c:url value='/user'/>">Gestion des Comptes</a></li>
 						</c:if>
 						<li><a href="<c:url value='/logout'/>">Deconnexion</a></li>

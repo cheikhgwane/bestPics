@@ -38,7 +38,7 @@
 	  <div class="intro-info">
 		<h2>Tous vos photos à  un seul endroit!<br /></h2>
 		<div>
-		  <a href="#about" class="btn-get-started scrollto">Faire un tour</a>
+		  <a href="${pageContext.request.contextPath}/explorer" class="btn-get-started scrollto">Faire un tour</a>
 		</div>
 	  </div>
 	</div>
@@ -52,7 +52,7 @@
 	<section id="about">
 	  <div class="container">
 		<header class="section-header">
-		  <h3>Comment Ã§a marche ?</h3>
+		  <h3>Comment ça marche ?</h3>
 		</header>
 
 		<div class="row about-extra">
@@ -86,7 +86,7 @@
 		  <div class="col-lg-4 col-md-6 footer-info">
 			<h3>BestPics</h3>
 			<p>
-			  RÃ©seau de partage de photos
+			  Réseau de partage de photos
 			</p>
 		  </div>
 		</div>

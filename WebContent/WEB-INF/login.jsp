@@ -17,6 +17,9 @@
 </head>
 </head>
 <body>
+	<div>
+		<c:import url="include/entete.jsp" />
+	</div>
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-8">
@@ -28,16 +31,18 @@
 						<form action="" method="post" role="form" class="contactForm">
 
 							<div class="form-group">
-								<label for="login">Login</label> <input
-									type="text" class="form-control" name="login" id="login"
-									aria-describedby="error"> 
-								<small style="color:red !important" id="error" class="form-text text-muted">${error.login}</small>
+								<label for="login">Login</label> <input type="text"
+									class="form-control" name="login" id="login"
+									aria-describedby="error"> <small
+									style="color: red !important" id="error"
+									class="form-text text-muted">${error.login}</small>
 							</div>
 							<div class="form-group">
 								<label for="password">Mot de passe</label> <input
-									type="password" name="password" class="form-control" id="exampleInputPassword1"
-									placeholder="Password">
-									<small style="color:red !important" id="error" class="form-text text-muted">${error.password}</small>
+									type="password" name="password" class="form-control"
+									id="exampleInputPassword1" placeholder="Password"> <small
+									style="color: red !important" id="error"
+									class="form-text text-muted">${error.password}</small>
 							</div>
 							<div style="margin-top: 10px" class="text-center">
 								<button type="submit" title="se connecter">Se connecter</button>

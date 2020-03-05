@@ -33,32 +33,29 @@
 				</div>
 				<div class="col-md-6">
 					<c:choose>
-					  <c:when test="${ not empty requestScope.utilisateurs }">
+					  <c:when test="${not empty requestScope.grantedUsers}">
 					      <table class="table">
 						<thead class="thead-light">
 							<tr>
 								<th scope="col">Nom</th>
 								<th scope="col">Prénom</th>
 								<th scope="col">Login</th>
-								<th scope="col">Administrateur</th>
 								<th scope="col">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
-							<c:forEach items="${requestScope.utilisateurs}" var="utilisateur">
+							<c:forEach items="${requestScope.grantedUsers}" var="utilisateur">
 								<tr>
 									<td><c:out value="${utilisateur.nom}" /></td>
 									<td><c:out value="${utilisateur.prenom }" /></td>
 									<td><c:out value="${utilisateur.login }" /></td>
-									<td><c:out value="${utilisateur.admin ? 'Oui': 'Non' }" /></td>
-									<td><a href="${pageContext.request.contextPath}/user/modify?idUser=${utilisateur.id }">Modifier</a></td>
 									<td><a href="${pageContext.request.contextPath}/user/delete?idUser=${utilisateur.id }">Supprimer</a></td>
 								</tr>
 							</c:forEach>
 						</tbody>
 					</table>
 					  </c:when>
-					  <c:otherwise> <h3>Aucun utilisateur présent dans la base de donnée</h3></c:otherwise>
+					  <c:otherwise> <h3>Aucun utilisateur autorisé</h3></c:otherwise>
 					</c:choose>
 				</div>
 			</div>

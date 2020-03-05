@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import beans.Album;
+import beans.Image;
 import beans.Utilisateur;
+import dao.AlbumDao;
 import dao.DaoException;
 import dao.UtilisateurDao;
 import utils.FormValidator;
@@ -19,11 +22,12 @@ import utils.FormValidator;
 /**
  * Servlet implementation class Authentification
  */
-@WebServlet({ "/login", "/logout","/register" })
+@WebServlet({ "/login", "/logout", "/register", "/explorer" })
 public class Authentification extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String LOGIN_VIEW = "/WEB-INF/login.jsp";
 	private static final String REGISTER_VIEW = "/WEB-INF/register.jsp";
+	private static final String EXPLORER_VIEW = "/WEB-INF/explorer.jsp";
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -43,10 +47,31 @@ public class Authentification extends HttpServlet {
 
 		if (requestedUrl.endsWith("/login")) {
 			getServletContext().getRequestDispatcher(LOGIN_VIEW).forward(request, response);
-		}else if(requestedUrl.endsWith("/register")) {
+		} else if (requestedUrl.endsWith("/register")) {
 			getServletContext().getRequestDispatcher(REGISTER_VIEW).forward(request, response);
-		}
-		else { // deconnexion
+		} else if (requestedUrl.endsWith("/explorer")) {
+			AlbumDao albumDao = new AlbumDao();
+
+			ArrayList<Album> albums;
+			ArrayList<Image> displayedImage = new ArrayList<Image>();
+			try {
+				albums = albumDao.getAllAlbum();
+				for (Album a : albums) {
+					if (!a.isPrivateAlbum() && a.getImages()!=null) {
+						for (Image i : a.getImages()) {
+							displayedImage.add(i);
+						}
+					}
+				}
+			} catch (DaoException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+			System.out.println(displayedImage.size());
+			request.setAttribute("images", displayedImage.size()!=0 ? displayedImage : null);
+			getServletContext().getRequestDispatcher(EXPLORER_VIEW).forward(request, response);
+
+		} else { // deconnexion
 			HttpSession session = request.getSession();
 			session.invalidate();
 			response.sendRedirect(request.getContextPath());
@@ -65,27 +90,28 @@ public class Authentification extends HttpServlet {
 
 		boolean isValid = validator.validateForm(fields);
 		System.out.println(isValid);
-		
+
 		if (!isValid) {
 			request.setAttribute("error", validator.getErrors());
 			getServletContext().getRequestDispatcher(LOGIN_VIEW).forward(request, response);
 			return;
 		}
-		
+
 		UtilisateurDao userDao = new UtilisateurDao();
 		Utilisateur u = validator.getUser();
-	
+
 		try {
 			ArrayList<Utilisateur> users = userDao.getUsers();
-			for(Utilisateur _u : users) {
-				if(_u.getLogin().equals(u.getLogin()) && _u.getPassword().equals(u.getPassword())) {
+			for (Utilisateur _u : users) {
+				if (_u.getLogin().equals(u.getLogin()) && _u.getPassword().equals(u.getPassword())) {
 					HttpSession session = request.getSession();
 					session.setAttribute("utilisateur", _u);
-					System.out.println("admin"+_u.isAdmin());
+					System.out.println("admin" + _u.isAdmin());
 					response.sendRedirect(request.getContextPath() + "/home");
 					return;
 				}
 			}
+			getServletContext().getRequestDispatcher(LOGIN_VIEW).forward(request, response);
 		} catch (DaoException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -95,6 +121,6 @@ public class Authentification extends HttpServlet {
 			getServletContext().getRequestDispatcher(LOGIN_VIEW).forward(request, response);
 			return;
 		}
-		
+
 	}
 }

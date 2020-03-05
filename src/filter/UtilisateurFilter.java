@@ -42,12 +42,12 @@ public class UtilisateurFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
 		HttpSession session = req.getSession();
-		System.out.println(session.getAttribute("utilisateur"));
 		
 		if (session.getAttribute("utilisateur") == null) {
 			resp.sendRedirect(req.getContextPath() + "/login");
 			return;
 		}
+		
 		Utilisateur user = (Utilisateur) session.getAttribute("utilisateur");
 		
 		if (!user.isAdmin()) {

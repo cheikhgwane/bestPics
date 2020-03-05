@@ -81,10 +81,12 @@
 										style="color: red !important" id="error"
 										class="form-text text-muted">${error.password}</small>
 								</div>
+									<p style="color:red;">${requestScope.status}</p>
 								<div style="margin-top: 10px" class="text-center">
 									<button class="btn btn-primary" type="submit"
 										title="se connecter">Ajouter</button>
 								</div>
+								
 							</form>
 						</div>
 					</div>

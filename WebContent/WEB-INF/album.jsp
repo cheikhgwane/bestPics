@@ -47,23 +47,31 @@
 				</div>
 			</div>
 			<div class="col-md-9">
-				<c:forEach items="${requestScope.albums }" var="album">
-					<div class="card" style="width: 18rem; float: left; margin: 5px;">
-						<button class="btn btn-outline-primary" data-toggle="modal"
-							data-target="#shareModal">Partager</button>
-						<img class="card-img-top" height="200px" width="100px" src="${pageContext.request.contextPath}/image/getOne?imageUrl=${album.albumUrl}" alt="cover">
-						<div class="card-body">
-							<h5 class="card-title">
-								<a
-									href="${pageContext.request.contextPath}/album?albumId=${album.id}">${album.nomAlbum}</a>
-							</h5>
-							<a href="${pageContext.request.contextPath}/album/modify"
-								class="btn btn-primary">Modifier</a> <a
-								href="${pageContext.request.contextPath}/album/delete?albumId=${album.id}"
-								class="btn btn-primary">Supprimer</a>
-						</div>
-					</div>
-				</c:forEach>
+				<c:choose>
+					<c:when test="${empty requestScope.albums }">
+						<h3>Vous n'avez pas encore créer d'album</h3>
+					</c:when>
+					<c:otherwise>
+						<c:forEach items="${requestScope.albums }" var="album">
+							<div class="card" style="width: 18rem; float: left; margin: 5px;">
+								<img class="card-img-top" height="200px" width="100px"
+									src="${pageContext.request.contextPath}/image/getOne?imageUrl=${album.albumUrl}"
+									alt="cover">
+								<div class="card-body">
+									<h5 class="card-title">
+										<a
+											href="${pageContext.request.contextPath}/album?albumId=${album.id}">${album.nomAlbum}</a>
+									</h5>
+									<a href="${pageContext.request.contextPath}/album/albumInfo?albumId=${album.id}"
+										class="btn btn-primary">Modifier</a> <a
+										href="${pageContext.request.contextPath}/album/delete?albumId=${album.id}"
+										class="btn btn-primary">Supprimer</a>
+								</div>
+							</div>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
+
 			</div>
 		</div>
 	</div>
@@ -84,15 +92,17 @@
 				</div>
 				<div class="modal-body">
 					<form action="${pageContext.request.contextPath}/album/add"
-						method="post" role="form" enctype="multipart/form-data" class="contactForm">
+						method="post" role="form" enctype="multipart/form-data"
+						class="contactForm">
 
 						<div class="form-group">
 							<label for="login">Nom album</label> <input required type="text"
 								class="form-control" name="albumName" id="albumName">
 						</div>
 						<div class="form-group">
-							<label for="login">Couverture album</label> <input required type="file"
-								class="form-control" name="albumCover" id="albumCover">
+							<label for="login">Couverture album</label> <input required
+								type="file" class="form-control" name="albumCover"
+								id="albumCover">
 						</div>
 
 						<div class="form-check">
@@ -110,50 +120,6 @@
 			</div>
 		</div>
 	</div>
-
-	<!-- share modal -->
-	<div class="modal fade" id="shareModal" tabindex="-1" role="dialog"
-		aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="shareModal">Partager Album</h5>
-					<button type="button" class="close" data-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<form action="${pageContext.request.contextPath}/album/share"
-						method="post" role="form" class="contactForm">
-
-						<select class=form-control multiple name="sharedWith">
-							<c:forEach items="${requestScope.utilisateurs }"
-								var="utilisateur">
-								<option value="${utilisateur.id}">${utilisateur.login }
-								</option>
-							</c:forEach>
-						</select>
-
-						<div class="form-check">
-							<input class="form-check-input" name="isPrivate" type="checkbox"
-								value="isPrivate" id="isPrivate"> <label
-								class="form-check-label" for="isPrivate">* Rendre cet
-								album public</label> <small id="error"
-								class="form-text text-muted">* Si cochez, ne prend pas en
-								compte la liste des utilisateurs selectionnés</small>
-						</div>
-
-						<div style="margin-top: 10px" class="text-center">
-							<button class="btn btn-primary" type="submit" title="Share">Partager
-								Album</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
 
 	<script
 		src="${pageContext.request.contextPath}/lib/jquery/jquery.min.js"></script>

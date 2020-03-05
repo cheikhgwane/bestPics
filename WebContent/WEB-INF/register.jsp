@@ -42,7 +42,7 @@
 				<div class="col-md-4">
 					<div id="register_form">
 						<div class="form">
-							<form action="/user/register" method="post" role="form"
+							<form action="${pageContext.request.contextPath}/user/register" method="post" role="form"
 								class="contactForm">
 								<div class="form-group">
 									<label for="nom">Nom</label> <input type="text"
@@ -85,6 +85,7 @@
 									<button class="btn btn-primary" type="submit"
 										title="se connecter">Valider</button>
 								</div>
+								<p style="color:red;">${requestScope.status }</p>
 							</form>
 						</div>
 					</div>
