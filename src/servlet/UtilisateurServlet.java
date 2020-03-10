@@ -143,6 +143,7 @@ public class UtilisateurServlet extends HttpServlet {
 			
 			String fields[] = { "nom", "prenom", "login", "password" };
 			boolean result = validator.validateForm(fields);
+			
 			if (!result) {
 				request.setAttribute("error", validator.getErrors());
 				request.setAttribute("status", "Erreur lors de l'inscription");
@@ -151,9 +152,18 @@ public class UtilisateurServlet extends HttpServlet {
 			}
 
 			try {
+				ArrayList<Utilisateur> users = dao.getUsers();
+				for(Utilisateur  u: users) {
+					if(u.getLogin().equalsIgnoreCase(validator.getUser().getLogin())) {
+						request.setAttribute("status", "Ce login a déja été utilisé!");
+						getServletContext().getRequestDispatcher(REGISTER_VIEW).forward(request, response);
+						return;
+					}
+				}
+				
 				dao.addUtilisateur(validator.getUser());
-				getServletContext().getRequestDispatcher(LOGIN_VIEW).forward(request, response);
-
+				
+				response.sendRedirect(request.getContextPath() + "/login");
 			} catch (DaoException e) {
 				System.out.println(e.getMessage());
 				request.setAttribute("status", "Erreur lors de l'ajout utilisateur");

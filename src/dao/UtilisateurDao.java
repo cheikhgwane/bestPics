@@ -24,6 +24,9 @@ public class UtilisateurDao {
 		        tx.commit();
 			}
 		} catch (Exception e) {
+			 if(tx==null) {
+				 throw new DaoException("session closed");
+			 }
 			 tx.rollback();
 			throw new DaoException(e.getMessage());
 		}
@@ -74,7 +77,7 @@ public class UtilisateurDao {
 				tx = session.beginTransaction();
 				Utilisateur u = session.find(Utilisateur.class,userId);
 				session.remove(u);
-				 tx.commit();
+				tx.commit();
 				return 0;
 			}
 			System.out.println("No user given");

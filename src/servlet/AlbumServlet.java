@@ -89,8 +89,6 @@ public class AlbumServlet extends HttpServlet {
 				request.setAttribute("utilisateurs", users);
 				request.setAttribute("grantedUsers", grantedUser);
 				
-				System.out.println("Taille liste utilisateur autorisé "+grantedUser.size());
-				
 
 			} catch (DaoException e) {
 				e.printStackTrace();

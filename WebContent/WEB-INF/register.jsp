@@ -7,16 +7,24 @@
 <meta charset="UTF-8">
 <title>BestPics</title>
 <!-- Bootstrap CSS File -->
-<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-
-<!-- Libraries CSS Files -->
-<link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-<link href="lib/animate/animate.min.css" rel="stylesheet" />
-<link href="lib/ionicons/css/ionicons.min.css" rel="stylesheet" />
-<link href="lib/owlcarousel/assets/owl.carousel.min.css"
+<link href="${pageContext.request.contextPath}/css/style.css"
 	rel="stylesheet" />
-<link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="<c:url value='css/style.css'/>">
+<!-- #about -->
+<link
+	href="${pageContext.request.contextPath}/lib/animate/animate.min.css"
+	rel="stylesheet" />
+<link
+	href="${pageContext.request.contextPath}/lib/ionicons/css/ionicons.min.css"
+	rel="stylesheet" />
+<link
+	href="${pageContext.request.contextPath}/lib/owlcarousel/assets/owl.carousel.min.css"
+	rel="stylesheet" />
+<link
+	href="${pageContext.request.contextPath}/lib/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link
+	href="${pageContext.request.contextPath}/lib/lightbox/css/lightbox.min.css"
+	rel="stylesheet" />
 
 <style>
 #register_form{
@@ -37,7 +45,7 @@
 		<div style="margin-top: 8%" class="container-fluid">
 			<div class="row">
 				<div class="col-md-8">
-					<img src="img/head.svg" alt="" class="img-fluid" />
+					<img src="${pageContext.request.contextPath}/img/head.svg" alt="" class="img-fluid" />
 				</div>
 				<div class="col-md-4">
 					<div id="register_form">

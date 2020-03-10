@@ -16,13 +16,13 @@
 
 		<nav class="main-nav float-right d-none d-lg-block">
 			<ul>
-				<li class="active"><a href="${pageContext.request.contextPath}/home/">Home</a></li>
 				<c:choose>
 					<c:when test="${empty sessionScope.utilisateur }">
 						<li><a  class="active" href="<c:url value='/login'/>">Se connecter</a></li>
 							<li><a href="<c:url value='/register'/>">Ouvrir un compte</a></li>
 					</c:when>
 					<c:otherwise>
+					<li class="active"><a href="${pageContext.request.contextPath}/home/">Home</a></li>
 						<li><a  
 							href="<c:url value='/album/user?userName=${sessionScope.utilisateur.login}'/>">Mes
 								photos</a></li>
